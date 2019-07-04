@@ -1,0 +1,8 @@
+/* pages/test/test.wxss */
+.div1{
+  color:red;
+}
+
+.active{
+  color:blue;
+}
