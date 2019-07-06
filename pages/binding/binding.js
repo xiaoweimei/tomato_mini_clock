@@ -1,4 +1,5 @@
 // pages/binding/binding.js
+const { http } = require('../../libs/http.js')
 Page({
 
   /**
@@ -7,18 +8,25 @@ Page({
   data: {
     account:'',
     password:'',
-    isBinding:true
+    password_digest:''
   },
   watchAccount(event){
+    this.setData({account:event.detail.value})
+    console.log(this.data.account)
   },
   watchPassword(event){
-
+    this.setData({password_digest:event.detail.value})
+    console.log(this.data.password_digest)
   },
-  goToSignUp(){
-    this.setData({isBinding:false})
-  },
-  goToBinding(){
-    this.setData({ isBinding: true })
+  submit(){
+    http.post('/bindings',{
+      account:this.data.account,
+      password_digest:this.data.password_digest
+    })
+    .then(response=>{
+      wx.setStorageSync('me', response.data.resource)
+      wx.reLaunch({ url: '/pages/home/home',})
+    })
   },
   /**
    * 生命周期函数--监听页面加载

@@ -1,21 +1,11 @@
 // pages/me/me.js
+const { http } = require('../../libs/http.js')
 Page({
   data: {
     tab:"tomato",
-    lists:{
-      "本周四":[
-        {time:"14:00",text:"项目文件编辑器",id:1},
-        { time: "14:00", text: "项目文件编辑器", id: 4 }
-        ],
-      "本周五": [
-        { time: "14:00" ,  text: "项目文件编辑器啦啦啦啦啦啦啦啦啦啦德玛西亚" , id: 2 },
-        { time: "14:00", text: "项目文件编辑器啦啦啦啦啦啦啦啦啦啦德玛西亚德玛西亚皇子", id: 2 }
-        ],
-      "本周六": [{ time: "14:00" , text: "项目文件编辑器" ,  id: 3 }],
-      "本周一": [{ time: "14:00" , text: "项目文件编辑器" ,  id: 33 }],
-      "本周二": [{ time: "14:00", text: "项目文件编辑器", id: 23 }],
-      "本周三": [{ time: "14:00", text: "项目文件编辑器", id: 13 }],
-    }
+    tomatoes:{},
+    todos:{},
+    me:{}
   },
   changeTab(event){
     let name = event.currentTarget.dataset.name
@@ -27,6 +17,23 @@ Page({
   onReady: function () {
   },
   onShow: function () {
+    this.fetchTomatoes()
+    this.fetchTodos()
+    this.setData({tomatoes:response.data.resources})
+  },
+  fetchTomatoes(){
+    http.get('/tomatoes', { is_group: 'yes' })
+    .then(response=>{
+      console.log(response)
+      this.setData({tomatoes:response.data.resources})
+    })  
+  },
+  fetchTodos(){
+    http.get('/todos', { is_group: 'yes' })
+    .then(response=>{
+      console.log(response)
+      this.setData({todos:response.data.resources})
+    })
   },
   onHide: function () {
   },

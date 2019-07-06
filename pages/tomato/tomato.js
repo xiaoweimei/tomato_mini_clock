@@ -1,4 +1,5 @@
 // pages/tomato/tomato.js
+const { http } = require('../../libs/http.js')
 Page({
 
   /**
@@ -6,7 +7,7 @@ Page({
    */
   timer: null,
   data: {
-    defaultSecond:1500,
+    defaultSecond:100,
     time:"",
     timerStatus:"stop",
     confirmVisible: false,
@@ -15,6 +16,10 @@ Page({
   },
   onShow: function () {
     this.startTimer()
+    http.post('/tomatoes').then(response=>{
+      this.setData({tomato:response.data.resource})
+      console.log(this.data.tomato)
+    })
   },
   startTimer(){
     this.setData({timerStatus:'start'})
@@ -30,7 +35,7 @@ Page({
     }, 1000)
   },
   againTimer(){
-    this.data.defaultSecond = 1500
+    this.data.defaultSecond = 100
     this.setData({ againButtonVisible: false })
     this.startTimer()
   },
@@ -55,12 +60,17 @@ Page({
   },
   confirmAbandon(event){
     let content=event.detail
-    wx.navigateBack({
-      to: -1
+    http.put(`/tomatoes/${this.data.tomato.id}`,{
+      description:content,
+      aborted:true
+    })
+    .then(response=>{
+      wx.navigateBack({ to: -1 })
     })
   },
   confirmFinish(event){
     let content=event.detail
+    wx.navigateBack({ to: -1 })
   },
   confirmCancel(){
     this.setData({finishConfirmVisible: false})
@@ -74,9 +84,17 @@ Page({
     this.startTimer()
   },
   onHide: function () {
-
+    this.clearTimer()
+    http.put(`/tomato/${this.data.tomato.id}`,{
+      description:"退出放弃",
+      aborted: true
+    })
   },
   onUnload: function () {
-
+    this.clearTimer()
+    http.put(`/tomatoes/${this.data.tomato.id}`,{
+      description:"退出放弃",
+      aborted:true
+    })
   }
 })

@@ -24,7 +24,7 @@ const _http = (method,url,data)=>{
         if(statusCode>=400){
           if(statusCode>=401){
             wx.redirectTo({
-              url: 'pages/login/login',
+              url: '/pages/login/login',
             })
           }
           reject({statusCode,response})

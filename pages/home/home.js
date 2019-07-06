@@ -1,16 +1,18 @@
 // pages/home/home.js
+const {http} = require('../../libs/http.js')
 Page({
+  updateId:'',
+  updateIndex:'',
   data: {
-    lists:[
-      {id:1,text:"今天你吃饭了么",finished:true},
-      { id: 2, text: "今天你吃饭了么", finished: true },
-      { id: 3, text: "今天你吃饭了么", finished: true },
-      { id: 4, text: "今天你吃饭了么", finished: false },
-      { id: 5, text: "今天你吃饭了么", finished: true },
-      { id: 6, text: "今天你吃饭了么", finished: false },
-      { id: 7, text: "今天你吃饭了么", finished: true },
-    ],
-    visible: false
+    lists:[],
+    visible: false,
+    visibleUpdateConfirm:false,
+    updateContent:''
+  },
+  onShow:function (){
+    http.get('/todos?completed=false').then(response=>{
+      this.setData({lists:response.data.resources})
+    })
   },
   confirm(event){
     console.log(event.detail)
@@ -18,30 +20,59 @@ Page({
   confirmCreate(event){
     console.log(event)
     let content = event.detail
-    if(content){
-      let todo = [{ id: this.data.lists.length + 1, text: content, finished: false }]
-      this.data.lists=todo.concat(this.data.lists)
-      console.log(12345)
-      this.setData({lists:this.data.lists})
+    console.log(content)
+    if (content) {
+      http.post('/todos', {
+        completed: false, description: content
+     })
+    .then(response =>{
+      console.log('成功传入数据')
+      let todo = [response.data.resource]
+      this.data.lists = todo.concat(this.data.lists)
+      this.setData({ lists: this.data.lists })
       this.hideConfirm()
+      })
     }
   },
+  changeText(event){
+    let {content,id,index} = event.currentTarget.dataset
+    this.updateId = id
+    this.updateIndex=index
+    this.setData({ visibleUpdateConfirm:true,updateContent:content})
+  },
+  confirmUpdate(event){
+    let content=event.detail
+    console.log(content)
+    http.put(`/todos/${this.updateId}`, {
+      description: content
+    }).then(response => {
+      let todo = response.data.resource
+      this.data.lists[this.updateIndex] = todo
+      this.setData({ lists: this.data.lists })
+      this.hideUpdateConfirm()
+    })
+  },
   destroyTodo(event){
-    console.log(event)
     let index = event.currentTarget.dataset.index
-    this.data.lists[index].finished = true
-    this.setData({lists: this.data.lists})
+    let id=event.currentTarget.dataset.id
+    http.put(`/todos/${id}`,{
+      completed:true
+    }).then(response=>{
+      let todo = response.data.resource
+      this.data.lists[index] = todo
+      this.setData({ lists: this.data.lists })
+    })
   },
   hideConfirm(){
     this.setData({visible:false})
+  },
+  hideUpdateConfirm(){
+    this.setData({ visibleUpdateConfirm: false })
   },
   showConfirm(){
     this.setData({visible:true})
   },
   onReady: function () {
-
-  },
-  onShow: function () {
 
   },
   onHide: function () {
