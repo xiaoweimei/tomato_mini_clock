@@ -7,7 +7,7 @@ Page({
    */
   timer: null,
   data: {
-    defaultSecond:100,
+    defaultSecond:1500,
     time:"",
     timerStatus:"stop",
     confirmVisible: false,
@@ -15,6 +15,7 @@ Page({
     finishConfirmVisible: false
   },
   onShow: function () {
+    console.log('欢迎来到番茄页面')
     this.startTimer()
     http.post('/tomatoes').then(response=>{
       this.setData({tomato:response.data.resource})
@@ -35,7 +36,7 @@ Page({
     }, 1000)
   },
   againTimer(){
-    this.data.defaultSecond = 100
+    this.data.defaultSecond = 1500
     this.setData({ againButtonVisible: false })
     this.startTimer()
   },
@@ -69,8 +70,27 @@ Page({
     })
   },
   confirmFinish(event){
+    this.clearTimer()
     let content=event.detail
-    wx.navigateBack({ to: -1 })
+    this.setData({finishConfirmVisible:false})
+    if(content){
+      http.put(`/tomatoes/${this.data.tomato.id}`,{
+        description:content,
+        aborted:false
+      })
+        .then(response => { 
+          // wx.reLaunch({ url: '/pages/home/home', })
+          console.log('到底出来了没')
+        })
+    }else{
+      http.put(`/tomatoes/${this.data.tomato.id}`,{
+        description:content,
+        aborted:true
+      })
+      .then(response=>{
+        wx.reLaunch({ url: '/pages/home/home',})
+      })
+    }
   },
   confirmCancel(){
     this.setData({finishConfirmVisible: false})
@@ -90,11 +110,11 @@ Page({
       aborted: true
     })
   },
-  onUnload: function () {
-    this.clearTimer()
-    http.put(`/tomatoes/${this.data.tomato.id}`,{
-      description:"退出放弃",
-      aborted:true
-    })
-  }
+  // onUnload: function () {
+  //   this.clearTimer()
+  //   http.put(`/tomatoes/${this.data.tomato.id}`,{
+  //     description:"退出放弃",
+  //     aborted:true
+  //   })
+  // }
 })

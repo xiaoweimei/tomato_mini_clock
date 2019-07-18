@@ -10,7 +10,9 @@ Page({
     updateContent:''
   },
   onShow:function (){
+    console.log('欢迎来到个人主页')
     http.get('/todos?completed=false').then(response=>{
+      console.log(response)
       this.setData({lists:response.data.resources})
     })
   },
@@ -72,22 +74,4 @@ Page({
   showConfirm(){
     this.setData({visible:true})
   },
-  onReady: function () {
-
-  },
-  onHide: function () {
-
-  },
-  onUnload: function () {
-
-  },
-  onPullDownRefresh: function () {
-
-  },
-  onReachBottom: function () {
-
-  },
-  onShareAppMessage: function () {
-
-  }
 })

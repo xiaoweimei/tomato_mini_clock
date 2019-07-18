@@ -4,6 +4,7 @@ Page({
   data:{
   },
   onShow: function () {
+    console.log('欢迎来到登录页面')
   },
   login(e){
     console.log(e)
@@ -13,7 +14,9 @@ Page({
     },
   wxLogin(encrypted_data,iv){
     wx.login({
-      success:(res)=> {this.loginMe(res.code, iv, encrypted_data)}
+      success:(res)=> {
+        console.log(res)
+        this.loginMe(res.code, iv, encrypted_data)}
     })
   },
   loginMe(code,iv,encrypted_data){
@@ -25,11 +28,17 @@ Page({
       app_secret
     })
       .then(response => {
+        console.log(456)
+        console.log(response)
         this.saveMessage(response)
         wx.reLaunch({ url: '/pages/home/home',})
       })
   },
   saveMessage(response){
+    console.log(response)
+    console.log(789)
+    console.log(response.data.resource)
+    console.log(response.header['X-token'])
     wx.setStorageSync('me', response.data.resource)
     wx.setStorageSync('X-token', response.header['X-token'])
   }
